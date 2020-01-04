@@ -19,10 +19,8 @@
 
 더 구체적인 방법은 [여기](https://youtu.be/oaXfXkPYHpw?t=144)에 있습니다.
 
-## 슬라이서 설정
-### 큐라 설정
-#### Machine setting
-##### Printer setting
+## Cura 설정
+### Printer setting
 - X : 200
 - Y : 177
 - Z : 185
@@ -32,10 +30,10 @@
 - Origin at center : no
 - G-code flavor : Marlin
 
-##### Head setting
+### Head setting
 - 버니어 캘리퍼스로 재보면 됨.
 
-##### Start Gcode
+### Start Gcode
 ~~~
 G1 E-5 F600; retract filament slightly
 
@@ -67,7 +65,7 @@ G92 E0      ;zero the extruded length
 M117 Print start!
 ~~~
 
-##### End Gcode
+### End Gcode
 ~~~
 G91
 G1 F1800 E-3
@@ -83,14 +81,7 @@ M84; Turn off th motors
 M117 Finished.
 ~~~
 
-##### Mechanical Setting
-- Nozzle size : 0.4mm
-- Compatible material diameter : 1.75mm
-- Heating bed : yes
-- BED size
-    - x : 300
-    - y : 300
-    - z : 400
+
 
 ## Bug reports
 - First layer가 뜨거나 베드를 긁는 경우 -> Z-offset값을 조정
