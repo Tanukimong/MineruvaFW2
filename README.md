@@ -1,10 +1,23 @@
-﻿# Mineruva FW
+﻿# Mineruva FW2
 
 개인 소장하고 있는 개조 FFF 프린터, 미네르바를 위한 각종 설정 모음
 
-## 펌웨어
-해당 펌웨어는 SKR MINI E3 v1.2와 TMC2209기반으로 구성되어 있음.
-이는 smart reprap controller를 지원하지 않아 mks mini 12864 controller를 별도 구매해야할듯 함.
+## 개발자 연락처 및 정보
+[신현호](https://tanukimong.github.io/online-cv)
+
+## HW info
+- 사용 메인보드 : [BIGTREETECH SKR-mini-E3](https://github.com/bigtreetech/BIGTREETECH-SKR-mini-E3)
+- 사용 드라이버 : TMC2209 Uart
+
+## 참고자료
+- Marlin Firmware [2.0.x](https://github.com/MarlinFirmware/Marlin) + [Bugfix-2.0.x](https://github.com/MarlinFirmware/Marlin/tree/bugfix-2.0.x)
+
+## 사용법
+해당 저장소를 Download한 후에, VScode에 내장된 PlamidIO를 이용하여 펌웨어를 업로드하시면됩니다.
+업로드 방법은 단순히 생성된 bin파일을 보드 내에 내장된 MicroSD slot에 업로드하여 보드에 전원을 재인가하면 됩니다.
+이 때, 핀의 위치를 바꾸어 전원 공급 방법을 External -> USB로 바꾸어 주어야, USB를 이용하여 **안전하게** 확인할 수 있습니다.
+
+더 구체적인 방법은 [여기](https://youtu.be/oaXfXkPYHpw?t=144)에 있습니다.
 
 ## 슬라이서 설정
 ### 큐라 설정
@@ -20,62 +33,79 @@
 - G-code flavor : Marlin
 
 ##### Head setting
-안 재봄
+- 버니어 캘리퍼스로 재보면 됨.
 
-##### Start G-code
+##### Start Gcode
 ~~~
-;Sliced at: {day} {date} {time}
-;Basic settings: Layer height: {layer_height} Walls: {wall_thickness} Fill: {fill_density}
-;Print time: {print_time}
-;Filament used: {filament_amount}m {filament_weight}g
-;Filament cost: {filament_cost}
-;M190 S{print_bed_temperature} ;Uncomment to add your own bed temperature line
-;M109 S{print_temperature} ;Uncomment to add your own temperature line
-;흘러내리지 않도록 내려간 필라멘트를 당깁니다.
-G21         ;metric values
-G90         ;absolute positioning
-M82         ;set extruder to absolute mode
-M107        ;start with the fan off
+G1 E-5 F600; retract filament slightly
 
-M117 Leveling...
-
+M117    Homing...
 G28	    ;Home Axis
+
+M117    Leveling...
 G29	    ;Auto Leveling
 
 M117 Cleaning...
 
-G12 P1 S1 T3; Nozzle cleaning
+G21 ;metric values
+G90 ;absolute positioning
 
-M117 Optimizing...
+G1 Z15.0 F6000 ; Move up 15mm at 6000mm/min 
+G92 E0 ; Reset extruder length to zero
 
-G1 X0 Y0 Z0.2 ;원점이동
+G1 X0.0 Y0.0 F1000.0 ; go to edge of print area
+G1 Z0.200 F1000.0 ; Go to Start Z position
+G1 X20.0 E9.0 F1000.0 ; intro line
+G1 X70.0 E21.5 F1000.0 ; intro line
 
-G1 Z10 F200 E5 ;move the platform down 5mm
+G1 E-3 F600; retract filament slightly
+
+G92 E0.0 ; reset extruder distance position
 
 G92 E0      ;zero the extruded length
 
-G1 F{travel_speed}
-
-;Put printing message on LCD screen
-
-M117 Printing...
+M117 Print start!
 ~~~
-##### End gcode
+
+##### End Gcode
 ~~~
-;End GCode
-M104 S0         ;heater off
-M140 S0         ;bed heater off
-M107            ;fan off
-G92 E0
-G1 E-3 F500     ;retract the filament a bit
-G92 E0
-G1 Y200 F5500   ;move Y to 200
-M84             ;steppers off
-G90             ;absolute positioning
-;{profile_string}
+G91
+G1 F1800 E-3
+G1 F3000 Z10
+G90
+G1 X150 Y250 ;Move to back
+
+M140 S0; Turn off the bed heater
+M104 S0; Turn off the nozzle heater
+M106 S0; Turn off the cooling fan
+M84; Turn off th motors
+
 M117 Finished.
 ~~~
 
-##### Nozzle Settings
+##### Mechanical Setting
 - Nozzle size : 0.4mm
 - Compatible material diameter : 1.75mm
+- Heating bed : yes
+- BED size
+    - x : 300
+    - y : 300
+    - z : 400
+
+## Bug reports
+- First layer가 뜨거나 베드를 긁는 경우 -> Z-offset값을 조정
+    - Z-offset 감소 : Z=0일 때, 베드와 노즐이 더 가까워짐
+    - Z-offset 증가 : Z=0일 때, 더 멀어짐
+
+## 적용 내역
+- S-curve acceleration
+- Babystepping
+- LCD 업그레이드
+- Noctua FAN을 이용한 팬 소음 감소
+- TMC2209기반으로 업그레이드
+  - Coolstep
+  - StallGuard
+  - Dual z-axis 보정
+  - BLtouch based auto leveling
+  - Hybrid Mode(Stealth/SpreadChop)기능 추가
+  - Crash detection 기반 HOMING 구현
