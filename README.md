@@ -22,8 +22,8 @@
 ## Cura 설정
 ### Printer setting
 - X : 200
-- Y : 177
-- Z : 185
+- Y : 163
+- Z : 180
 - Build plate shape = Rect.
 - Heat bed : yes
 - Heated build volume : no
@@ -57,7 +57,6 @@ G1 X20.0 E9.0 F1000.0 ; intro line
 G1 X70.0 E21.5 F1000.0 ; intro line
 
 G1 E-3 F600; retract filament slightly
-
 G92 E0.0 ; reset extruder distance position
 
 G92 E0      ;zero the extruded length
@@ -67,20 +66,21 @@ M117 Print start!
 
 ### End Gcode
 ~~~
-G91
-G1 F1800 E-3
+G90          ; Absolute coordinate
+G1 X100 Y160 ; Move to back
+
+G91             ; Relative coordinate
+G1 F1800 E-3    ; Retract a little bit
 G1 F3000 Z10
-G90
-G1 X150 Y250 ;Move to back
+G92 E0
 
 M140 S0; Turn off the bed heater
 M104 S0; Turn off the nozzle heater
 M106 S0; Turn off the cooling fan
-M84; Turn off th motors
+M84; Turn off all motors
 
 M117 Finished.
 ~~~
-
 
 
 ## Bug reports
